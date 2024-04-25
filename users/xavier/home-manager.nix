@@ -336,7 +336,7 @@ in {
               "battery all".enable = false;
           };
       };
-/*
+
   programs.neovim = {
     enable = true;
     package = pkgs.neovim-nightly;
@@ -383,7 +383,7 @@ in {
     ]);
 
     extraConfig = (import ./vim-config.nix) { inherit sources; };
-  }; */
+  }; 
 
   services.gpg-agent = {
     enable = isLinux;
