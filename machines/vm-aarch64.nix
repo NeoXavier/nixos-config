@@ -14,6 +14,7 @@
 
   # Interface is this on M1
   networking.interfaces.ens160.useDHCP = true;
+  # networking.interfaces.ens192.useDHCP = true;
 
   # Lots of stuff that uses aarch64 that claims doesn't work, but actually works.
   nixpkgs.config.allowUnfree = true;

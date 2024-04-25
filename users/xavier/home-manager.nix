@@ -38,10 +38,10 @@ in {
     pkgs.jq
     pkgs.ripgrep
     pkgs.tree
-    pkgs.watch
+    # pkgs.watch
 
-    pkgs.gopls
-    pkgs.zigpkgs."0.12.0"
+    # pkgs.gopls
+    # pkgs.zigpkgs."0.12.0"
 
     # Node is required for Copilot.vim
     pkgs.nodejs
@@ -53,7 +53,7 @@ in {
     pkgs.chromium
     pkgs.firefox
     pkgs.rofi
-    pkgs.valgrind
+    # pkgs.valgrind
     pkgs.zathura
     pkgs.xfce.xfce4-terminal
   ]);
@@ -71,35 +71,35 @@ in {
     MANPAGER = "${manpager}/bin/manpager";
   };
 
-  home.file.".gdbinit".source = ./gdbinit;
-  home.file.".inputrc".source = ./inputrc;
+  # home.file.".gdbinit".source = ./gdbinit;
+  # home.file.".inputrc".source = ./inputrc;
 
   xdg.configFile = {
     "i3/config".text = builtins.readFile ./i3;
     "rofi/config.rasi".text = builtins.readFile ./rofi;
 
-    # tree-sitter parsers
-    "nvim/parser/proto.so".source = "${pkgs.tree-sitter-proto}/parser";
-    "nvim/queries/proto/folds.scm".source =
-      "${sources.tree-sitter-proto}/queries/folds.scm";
-    "nvim/queries/proto/highlights.scm".source =
-      "${sources.tree-sitter-proto}/queries/highlights.scm";
-    "nvim/queries/proto/textobjects.scm".source =
-      ./textobjects.scm;
+  #   # tree-sitter parsers
+  #   "nvim/parser/proto.so".source = "${pkgs.tree-sitter-proto}/parser";
+  #   "nvim/queries/proto/folds.scm".source =
+  #     "${sources.tree-sitter-proto}/queries/folds.scm";
+  #   "nvim/queries/proto/highlights.scm".source =
+  #     "${sources.tree-sitter-proto}/queries/highlights.scm";
+  #   "nvim/queries/proto/textobjects.scm".source =
+  #     ./textobjects.scm;
   } // (if isDarwin then {
     # Rectangle.app. This has to be imported manually using the app.
     "rectangle/RectangleConfig.json".text = builtins.readFile ./RectangleConfig.json;
   } else {}) // (if isLinux then {
     "ghostty/config".text = builtins.readFile ./ghostty.linux;
   } else {});
-
+  #
   #---------------------------------------------------------------------
   # Programs
   #---------------------------------------------------------------------
 
   programs.gpg.enable = !isDarwin;
 
-  programs.bash = {
+  /* programs.bash = {
     enable = true;
     shellOptions = [];
     historyControl = [ "ignoredups" "ignorespace" ];
@@ -168,97 +168,175 @@ in {
       "fish-foreign-env"
       "theme-bobthefish"
     ];
-  };
+  }; */
 
   programs.git = {
     enable = true;
-    userName = "Mitchell Hashimoto";
-    userEmail = "mitchell.hashimoto@gmail.com";
-    signing = {
-      key = "523D5DC389D273BC";
-      signByDefault = true;
-    };
-    aliases = {
-      cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
-      prettylog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
-      root = "rev-parse --show-toplevel";
-    };
+    userName = "NeoXavier";
+    userEmail = "xavierneo88@gmail.com";
+    # signing = {
+    #   key = "523D5DC389D273BC";
+    #   signByDefault = true;
+    # };
+    # aliases = {
+    #   cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
+    #   prettylog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
+    #   root = "rev-parse --show-toplevel";
+    # };
     extraConfig = {
       branch.autosetuprebase = "always";
       color.ui = true;
-      core.askPass = ""; # needs to be empty to use terminal for ask pass
-      credential.helper = "store"; # want to make this more secure
-      github.user = "mitchellh";
+      # core.askPass = ""; # needs to be empty to use terminal for ask pass
+      # credential.helper = "store"; # want to make this more secure
+      github.user = "NeoXavier";
       push.default = "tracking";
-      init.defaultBranch = "main";
+      init.defaultBranch = "master";
     };
   };
 
-  programs.go = {
+  /* programs.go = {
     enable = true;
     goPath = "code/go";
     goPrivate = [ "github.com/mitchellh" "github.com/hashicorp" "rfc822.mx" ];
-  };
+  }; */
 
   programs.tmux = {
     enable = true;
-    terminal = "xterm-256color";
-    shortcut = "l";
+    shortcut = "a";
     secureSocket = false;
 
+    # Remove delay when pressing escape
+    escapeTime = 0;
+
+    plugins = with pkgs; [
+      tmuxPlugins.catppuccin
+    ];
+
     extraConfig = ''
-      set -ga terminal-overrides ",*256col*:Tc"
+    # Colors
+    set -g default-terminal "tmux-256color"
+    set -ga terminal-overrides ",*256col*:Tc"
+    set -ga terminal-overrides '*:Ss=\E[%p1%d q:Se=\E[ q'
+    set-environment -g COLORTERM "truecolor"
 
-      set -g @dracula-show-battery false
-      set -g @dracula-show-network false
-      set -g @dracula-show-weather false
+    unbind C-b
+    set-option -g prefix C-a
+    bind-key C-a send-prefix
+    set -g status-style 'bg=#333333 fg=#5eacd3'
 
-      bind -n C-k send-keys "clear"\; send-keys "Enter"
+    bind r source-file ~/.tmux.conf
+    set -g base-index 1
 
-      run-shell ${sources.tmux-pain-control}/pain_control.tmux
-      run-shell ${sources.tmux-dracula}/dracula.tmux
+    # split panes using | and -
+    bind | split-window -h
+    bind - split-window -v
+    unbind '"'
+    unbind %
+    
+    # vim-like pane switching
+    bind -r ^ last-window
+    bind -r k select-pane -U
+    bind -r j select-pane -D
+    bind -r h select-pane -L
+    bind -r l select-pane -R
+
+    # don't rename windows automatically
+    set-option -g allow-rename off
+
+    bind c new-window -c "#{pane_current_path}"
+
+    bind-key -r f run-shell "tmux neww ~/.local/bin/tmux-sessionizer"
     '';
   };
 
   programs.alacritty = {
-    enable = !isWSL;
+      enable = !isWSL;
 
-    settings = {
-      env.TERM = "xterm-256color";
+      settings = {
+          colors = {
+              draw_bold_text_with_bright_colors = true;
+              primary = {
+                  background = "#282a36";
+                  foreground = "#eff0eb";
+              };
+              cursor = {
+                  cursor = "#97979b";
+              };
+              selection = {
+                  text = "#282a36";
+                  background = "#feffff";
+              };
+              normal = {
+                  black = "#282a36";
+                  red = "#ff5c57";
+                  green = "#5af78e";
+                  yellow = "#f3f99d";
+                  blue = "#57c7ff";
+                  magenta = "#ff6ac1";
+                  cyan = "#9aedfe";
+                  white = "#f1f1f0";
+              };
+              bright = {
+                  black = "#686868";
+                  red = "#ff5c57";
+                  green = "#5af78e";
+                  yellow = "#f3f99d";
+                  blue = "#57c7ff";
+                  magenta = "#ff6ac1";
+                  cyan = "#9aedfe";
+                  white = "#eff0eb";
+              };
+          };
+          env = {
+              TERM = "xterm-256color";
+          };
+          font = {
+              size = 14;
+              normal = {
+                  family = "JetBrains Mono";
+                  style = "Regular";
+              };
+              italic = {
+                  family = "JetBrains Mono";
+                  style = "Italic";
+              };
+              bold = {
+                  family = "JetBrains Mono";
+                  style = "Bold";
+              };
+              bold_italic = {
+                  family = "JetBrains Mono";
+                  style = "Bold Italic";
+              };
+          };
+          window = {
+              opacity = 0.85;
+              title = "Alacritty";
+          };
+      };
 
-      key_bindings = [
-        { key = "K"; mods = "Command"; chars = "ClearHistory"; }
-        { key = "V"; mods = "Command"; action = "Paste"; }
-        { key = "C"; mods = "Command"; action = "Copy"; }
-        { key = "Key0"; mods = "Command"; action = "ResetFontSize"; }
-        { key = "Equals"; mods = "Command"; action = "IncreaseFontSize"; }
-        { key = "Subtract"; mods = "Command"; action = "DecreaseFontSize"; }
-      ];
-    };
-  };
+      /* programs.kitty = {
+         enable = !isWSL;
+         extraConfig = builtins.readFile ./kitty;
+         }; */
 
-  programs.kitty = {
-    enable = !isWSL;
-    extraConfig = builtins.readFile ./kitty;
-  };
+      programs.i3status = {
+          enable = isLinux && !isWSL;
 
-  programs.i3status = {
-    enable = isLinux && !isWSL;
+          general = {
+              colors = true;
+              color_good = "#8C9440";
+              color_bad = "#A54242";
+              color_degraded = "#DE935F";
+          };
 
-    general = {
-      colors = true;
-      color_good = "#8C9440";
-      color_bad = "#A54242";
-      color_degraded = "#DE935F";
-    };
-
-    modules = {
-      ipv6.enable = false;
-      "wireless _first_".enable = false;
-      "battery all".enable = false;
-    };
-  };
-
+          modules = {
+              ipv6.enable = false;
+              "wireless _first_".enable = false;
+              "battery all".enable = false;
+          };
+      };
+/*
   programs.neovim = {
     enable = true;
     package = pkgs.neovim-nightly;
@@ -305,7 +383,7 @@ in {
     ]);
 
     extraConfig = (import ./vim-config.nix) { inherit sources; };
-  };
+  }; */
 
   services.gpg-agent = {
     enable = isLinux;
