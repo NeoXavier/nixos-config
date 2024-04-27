@@ -8,12 +8,9 @@ name:
   system,
   user,
   darwin ? false,
-  wsl ? false
 }:
 
 let
-  # True if this is a WSL system.
-  isWSL = wsl;
 
   # The config files for this system.
   machineConfig = ../machines/${name}.nix;
@@ -27,13 +24,6 @@ in systemFunc rec {
   inherit system;
 
   modules = [
-    # Apply our overlays. Overlays are keyed by system type so we have
-    # to go through and apply our system type. We do this first so
-    # the overlays are available globally.
-    # { nixpkgs.overlays = overlays; }
-
-    # Bring in WSL if this is a WSL build
-    (if isWSL then inputs.nixos-wsl.nixosModules.wsl else {})
 
     machineConfig
     userOSConfig
@@ -41,7 +31,6 @@ in systemFunc rec {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.${user} = import userHMConfig {
-        isWSL = isWSL;
         inputs = inputs;
       };
     }
@@ -53,7 +42,6 @@ in systemFunc rec {
         currentSystem = system;
         currentSystemName = name;
         currentSystemUser = user;
-        isWSL = isWSL;
         inputs = inputs;
       };
     }

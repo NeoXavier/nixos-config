@@ -38,10 +38,7 @@ in {
             pkgs.jq
             pkgs.ripgrep
             pkgs.tree
-# pkgs.watch
-
-# pkgs.gopls
-# pkgs.zigpkgs."0.12.0"
+            pkgs.oh-my-zsh
 
 # Node is required for Copilot.vim
             pkgs.nodejs
@@ -53,7 +50,6 @@ in {
         pkgs.chromium
         pkgs.firefox
         pkgs.rofi
-# pkgs.valgrind
         pkgs.zathura
         pkgs.xfce.xfce4-terminal
     ]);
@@ -193,12 +189,6 @@ programs.git = {
         init.defaultBranch = "master";
     };
 };
-
-/* programs.go = {
-   enable = true;
-   goPath = "code/go";
-   goPrivate = [ "github.com/mitchellh" "github.com/hashicorp" "rfc822.mx" ];
-   }; */
 
 programs.tmux = {
     enable = true;
@@ -341,16 +331,18 @@ programs.neovim = {
     viAlias = true;
 }; 
 
-
-programs.zsh.ohMyZsh = {
+programs.zsh ={
     enable = true;
-    plugins = [
-        "git"
-        "autojump"
-        "zsh-syntax-highlighting"
-    ];
-    theme = "agnoster";
-};
+    ohMyZsh = {
+        enable = true;
+        plugins = [
+            "git"
+                "autojump"
+                "zsh-syntax-highlighting"
+        ];
+        theme = "agnoster";
+    };
+}
 
 # services.gpg-agent = {
 #     enable = isLinux;
