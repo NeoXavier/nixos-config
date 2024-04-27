@@ -334,14 +334,14 @@ programs.neovim = {
 
 programs.zsh ={
     enable = true;
-    ohMyZsh = {
+    oh-my-zsh = {
         enable = true;
         plugins = [
             "autojump"
         ];
         theme = "agnoster";
     };
-}
+};
 
 # services.gpg-agent = {
 #     enable = isLinux;
