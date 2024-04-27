@@ -38,6 +38,7 @@ in {
             pkgs.jq
             pkgs.ripgrep
             pkgs.tree
+            pkgs.autojump
             pkgs.oh-my-zsh
 
 # Node is required for Copilot.vim
@@ -336,9 +337,7 @@ programs.zsh ={
     ohMyZsh = {
         enable = true;
         plugins = [
-            "git"
-                "autojump"
-                "zsh-syntax-highlighting"
+            "autojump"
         ];
         theme = "agnoster";
     };
