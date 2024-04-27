@@ -38,7 +38,6 @@ in {
             pkgs.jq
             pkgs.ripgrep
             pkgs.tree
-            pkgs.oh-my-zsh
 # pkgs.watch
 
 # pkgs.gopls
@@ -345,6 +344,12 @@ programs.neovim = {
 
 programs.zsh.ohMyZsh = {
     enable = true;
+    plugins = [
+        "git"
+        "autojump"
+        "zsh-syntax-highlighting"
+    ];
+    theme = "agnoster";
 };
 
 # services.gpg-agent = {
