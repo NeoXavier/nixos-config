@@ -330,6 +330,79 @@ programs.neovim = {
     defaultEditor = true;
     vimAlias = true;
     viAlias = true;
+
+    plugins = [
+        # Telescope
+        pkgs.vimPlugins.plenary-nvim
+        pkgs.vimPlugins.popup-nvim
+        pkgs.vimPlugins.telescope-nvim
+        
+        # Status and Buffer line
+        pkgs.vimPlugins.lualine-nvim
+        pkgs.vimPlugins.bufferline-nvim
+        pkgs.vimPlugins.nvim-web-devicons
+        
+        # LSP
+        pkgs.vimPlugins.lspkind-nvim
+        pkgs.vimPlugins.lsp_extensions-nvim
+        pkgs.vimPlugins.lspsaga-nvim
+        pkgs.vimPlugins.symbols-outline-nvim
+
+        pkgs.vimPlugins.nvim-treesitter
+        pkgs.vimPlugins.undotree
+        
+        # LSP Zero
+        # # LSP Support
+        pkgs.vimPlugins.lspzero-nvim
+        pkgs.vimPlugins.lspconfig-nvim
+        pkgs.vimPlugins.mason-nvim
+        pkgs.vimPlugins.mason-lspconfig-nvim
+
+        # # Autocompletion
+        pkgs.vimPlugins.nvim-cmp
+        pkgs.vimPlugins.cmp-buffer
+        pkgs.vimPlugins.cmp-path
+        pkgs.vimPlugins.cmp-luasnip
+        pkgs.vimPlugins.cmp-nvim-lsp
+        pkgs.vimPlugins.cmp-nvim-lua
+        
+        # # Snippets
+        pkgs.vimPlugins.luasnip
+        pkgs.vimPlugins.friendly-snippets
+
+        # Autopairs
+        pkgs.vimPlugins.auto-pairs
+
+        # Comments
+        pkgs.vimPlugins.nvim-comment
+        
+        # Trouble
+        pkgs.vimPlugins.trouble-nvim
+        
+        # Theme
+        pkgs.vimPlugins.gruvbox-nvim
+        pkgs.vimPlugins.gruvbox-material
+
+        # Copilot
+        pkgs.vimPlugins.copilot-vim
+    ]
+
+    extraConfig = ''
+        lua << EOF
+        ${builtins.readFile ./nvim/lua/plugin/remap.lua}
+        ${builtins.readFile ./nvim/lua/plugin/set.lua}
+        ${builtins.readFile ./nvim/lua/plugin/telescope.lua}
+        ${builtins.readFile ./nvim/lua/plugin/colors.lua}
+        ${builtins.readFile ./nvim/lua/plugin/copilot.lua}
+        ${builtins.readFile ./nvim/lua/plugin/format.lua}
+        ${builtins.readFile ./nvim/lua/plugin/lsp.lua}
+        ${builtins.readFile ./nvim/lua/plugin/luasnip.lua}
+        ${builtins.readFile ./nvim/lua/plugin/statusline.lua}
+        ${builtins.readFile ./nvim/lua/plugin/telescope.lua}
+        ${builtins.readFile ./nvim/lua/plugin/treesitter.lua}
+        ${builtins.readFile ./nvim/lua/plugin/trouble.lua}
+        ${builtins.readFile ./nvim/lua/plugin/setups.lua}
+    '';
 }; 
 
 programs.zsh ={
