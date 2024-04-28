@@ -1,0 +1,45 @@
+{
+  "html5-boilerplate": {
+    "prefix": "html5-boilerplate",
+    "body": [
+      "<!DOCTYPE html>",
+      "<html>",
+      "\t<head>",
+      "\t\t<meta charset=\"utf-8\">",
+      "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">",
+      "\t\t<title>$1</title>",
+      "\t\t<meta name=\"description\" content=\"\">",
+      "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+      "\t\t<link rel=\"stylesheet\" href=\"$2\">",
+      "\t</head>",
+      "\t<body>",
+      "\t\t$3",
+      "\t\t<script src=\"$4\" async defer></script>",
+      "\t</body>",
+      "</html>"
+    ],
+    "description": "A very basic HTML5 boiler plate code."
+  },
+  "p5js-html": {
+    "prefix": "p5js-html",
+    "body": [
+      "<!DOCTYPE html>",
+      "<html>",
+      "\t<head>",
+      "\t\t<meta charset=\"utf-8\">",
+      "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">",
+      "\t\t<title>$1</title>",
+      "\t\t<meta name=\"description\" content=\"\">",
+      "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+      "\t\t<script src=\"p5.min.js\"></script>",
+      "\t\t<script src=\"sketch.js\"></script>",
+      "\t</head>",
+      "\t<body>",
+      "\t\t$2",
+      "\t</body>",
+      "</html>"
+    ],
+    "description": "Basic HTML boilerplate for p5.js project"
+  }
+
+}

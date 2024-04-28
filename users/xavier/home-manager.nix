@@ -4,6 +4,7 @@
 
 let
   sources = import ../../nix/sources.nix;
+  basePath = toString ./.;
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
 
@@ -353,8 +354,8 @@ programs.neovim = {
         
         # LSP Zero
         # # LSP Support
-        pkgs.vimPlugins.lspzero-nvim
-        pkgs.vimPlugins.lspconfig-nvim
+        pkgs.vimPlugins.lsp-zero-nvim
+        pkgs.vimPlugins.nvim-lspconfig
         pkgs.vimPlugins.mason-nvim
         pkgs.vimPlugins.mason-lspconfig-nvim
 
@@ -362,7 +363,7 @@ programs.neovim = {
         pkgs.vimPlugins.nvim-cmp
         pkgs.vimPlugins.cmp-buffer
         pkgs.vimPlugins.cmp-path
-        pkgs.vimPlugins.cmp-luasnip
+        pkgs.vimPlugins.cmp_luasnip
         pkgs.vimPlugins.cmp-nvim-lsp
         pkgs.vimPlugins.cmp-nvim-lua
         
@@ -385,23 +386,23 @@ programs.neovim = {
 
         # Copilot
         pkgs.vimPlugins.copilot-vim
-    ]
+    ];
 
     extraConfig = ''
         lua << EOF
-        ${builtins.readFile ./nvim/lua/plugin/remap.lua}
-        ${builtins.readFile ./nvim/lua/plugin/set.lua}
-        ${builtins.readFile ./nvim/lua/plugin/telescope.lua}
-        ${builtins.readFile ./nvim/lua/plugin/colors.lua}
-        ${builtins.readFile ./nvim/lua/plugin/copilot.lua}
-        ${builtins.readFile ./nvim/lua/plugin/format.lua}
-        ${builtins.readFile ./nvim/lua/plugin/lsp.lua}
-        ${builtins.readFile ./nvim/lua/plugin/luasnip.lua}
-        ${builtins.readFile ./nvim/lua/plugin/statusline.lua}
-        ${builtins.readFile ./nvim/lua/plugin/telescope.lua}
-        ${builtins.readFile ./nvim/lua/plugin/treesitter.lua}
-        ${builtins.readFile ./nvim/lua/plugin/trouble.lua}
-        ${builtins.readFile ./nvim/lua/plugin/setups.lua}
+        ${builtins.readFile (basePath + "/nvim/lua/plugin/remap.lua")}
+        ${builtins.readFile (basePath + "/nvim/lua/plugin/set.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/telescope.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/colors.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/copilot.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/format.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/lsp.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/luasnip.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/statusline.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/telescope.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/treesitter.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/trouble.lua")}
+        ${builtins.readFile (basePath + "/nvim/after/plugin/setups.lua")}
     '';
 }; 
 
