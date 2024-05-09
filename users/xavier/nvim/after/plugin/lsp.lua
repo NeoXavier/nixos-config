@@ -1,49 +1,102 @@
-local lsp = require("lsp-zero")
+-- NEW
 
-lsp.preset("recommended")
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('user_lsp_attach', {clear = true}),
+    callback = function(event)
+        local opts = {buffer = event.buf}
 
-lsp.ensure_installed({
-    'html',
-    'cssls',
-    'tsserver',
-    'pyright'
-})
-
-lsp.configure('lua_ls', {
-    settings = {
-        Lua = {
-            diagnostics = {
-                globals = { 'vim' }
-            }
-        }
-    }
-})
-
-lsp.configure('ltex', {
-    settings = {
-        ltex = {
-            language = "en-GB",
-            dictionary = "en",
-            formatter = "latexindent",
-        },
-    },
+        vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+        vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+        vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
+        vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
+        --vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)
+        --vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)
+        vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
+        vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
+        vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
+        --vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
+    end,
 })
 
 local cmp = require('cmp')
-local cmp_select = { behavior = cmp.SelectBehavior.Insert }
-local cmp_mappings = lsp.defaults.cmp_mappings({
-    ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-    ["<C-u>"] = cmp.mapping.scroll_docs(-4),
-    ["<C-d>"] = cmp.mapping.scroll_docs(4),
-    ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
-    ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-    ['<C-Space>'] = cmp.mapping.complete(),
+local cmp_lsp = require('cmp_nvim_lsp')
+local capabilities = vim.tbl_deep_extend(
+    "force",
+    {},
+    vim.lsp.protocol.make_client_capabilities(),
+    cmp_lsp.default_capabilities()
+)
+
+require('fidget').setup({})
+require('mason').setup({})
+require('mason-lspconfig').setup({
+     ensure_installed = {
+        'html',
+        'cssls',
+        'tsserver',
+        'pyright'
+    },
+    
+    handlers = {
+        function(server_name)
+            require('lspconfig')[server_name].setup({
+                capabilities = lsp_capabilities,
+            })
+        end,
+        ["lua_ls"] = function()
+            local lspconfig = require('lspconfig')
+            lspconfig.lua_ls.setup{
+                capabilities = capabilities,
+                settings = {
+                    Lua = {
+                        diagnostics = {
+                            globals = { 'vim' }
+                        }
+                    }
+                }
+            
+            }
+        end,
+    }
 })
 
--- disable completion with tab
--- this helps with copilot setup
-cmp_mappings['<Tab>'] = nil
-cmp_mappings['<S-Tab>'] = nil
+local cmp_select = { behavior = cmp.SelectBehavior.Insert }
+
+cmp.setup({
+    snippet = {
+        expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+        end,
+    },
+    mapping = cmp.mapping.preset.insert({
+        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+        ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-d>"] = cmp.mapping.scroll_docs(4),
+        ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
+        ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<Tab>'] = nil,
+        ['<S-Tab>'] = nil,
+    }),
+    sources = cmp.config.sources({
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+    },{
+        { name = "buffer" },
+    })
+})
+
+vim.diagnostic.config({
+    -- virtual_text = true,
+    float = {
+        focusable = false,
+        style = "minimal",
+        border = "rounded",
+        source = "always",
+        header = "",
+        prefix = "",
+    },
+})
 
 local lspkind = require("lspkind")
 local source_mapping = {
@@ -53,75 +106,42 @@ local source_mapping = {
     path = "[Path]",
 }
 
-lsp.setup_nvim_cmp({
-    mapping = cmp_mappings,
-    formatting = {
-        format = function(entry, vim_item)
-            vim_item.kind = lspkind.presets.default[vim_item.kind]
-            local menu = source_mapping[entry.source.name]
-            --if entry.source.name == "cmp_tabnine" then
-            --if entry.completion_item.data ~= nil and entry.completion_item.data.detail ~= nil then
-            --menu = entry.completion_item.data.detail .. " " .. menu
-            --end
-            --vim_item.kind = ""
-            --end
-            vim_item.menu = menu
-            return vim_item
-        end,
-    },
-    sources = {
-        -- tabnine completion? yayaya
-        --{ name = "cmp_tabnine" },
-        { name = "nvim_lsp" },
-        -- For luasnip user.
-        { name = "luasnip" },
-        { name = "buffer" },
-    },
-})
+-- lsp.setup_nvim_cmp({
+--     mapping = cmp_mappings,
+--     formatting = {
+--         format = function(entry, vim_item)
+--             vim_item.kind = lspkind.presets.default[vim_item.kind]
+--             local menu = source_mapping[entry.source.name]
+--             --if entry.source.name == "cmp_tabnine" then
+--             --if entry.completion_item.data ~= nil and entry.completion_item.data.detail ~= nil then
+--             --menu = entry.completion_item.data.detail .. " " .. menu
+--             --end
+--             --vim_item.kind = ""
+--             --end
+--             vim_item.menu = menu
+--             return vim_item
+--         end,
+--     },
+--     sources = {
+--         -- tabnine completion? yayaya
+--         --{ name = "cmp_tabnine" },
+--         { name = "nvim_lsp" },
+--         -- For luasnip user.
+--         { name = "luasnip" },
+--         { name = "buffer" },
+--     },
+-- })
+--
+-- lsp.set_preferences({
+--     suggest_lsp_servers = false,
+--     sign_icons = {
+--         error = 'E',
+--         warn = 'W',
+--         hint = 'H',
+--         info = 'I'
+--     }
+-- })
 
-lsp.set_preferences({
-    suggest_lsp_servers = false,
-    sign_icons = {
-        error = 'E',
-        warn = 'W',
-        hint = 'H',
-        info = 'I'
-    }
-})
-
-lsp.on_attach(function(client, bufnr)
-    local opts = { buffer = bufnr, remap = false }
-
-    if client.name == "eslint" then
-        vim.cmd.LspStop('eslint')
-        return
-    end
-
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
-    --vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)
-    --vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
-    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
-    --vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
-    -- Create a command `:Format` local to the LSP buffer
-    vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-        if vim.lsp.buf.format then
-            vim.lsp.buf.format()
-        elseif vim.lsp.buf.formatting then
-            vim.lsp.buf.formatting()
-        end
-    end, { desc = 'Format current buffer with LSP' })
-end)
-
-lsp.setup()
-
-vim.diagnostic.config({
-    virtual_text = true,
-})
 
 local opts = {
     -- whether to highlight the currently hovered symbol

@@ -41,6 +41,9 @@ in {
             pkgs.tree
             pkgs.autojump
             pkgs.oh-my-zsh
+            pkgs.tree-sitter
+
+            pkgs.gcc
 
 # Node is required for Copilot.vim
             pkgs.nodejs
@@ -76,14 +79,14 @@ in {
         "i3/config".text = builtins.readFile ./i3;
         "rofi/config.rasi".text = builtins.readFile ./rofi;
 
-#   # tree-sitter parsers
-#   "nvim/parser/proto.so".source = "${pkgs.tree-sitter-proto}/parser";
-#   "nvim/queries/proto/folds.scm".source =
-#     "${sources.tree-sitter-proto}/queries/folds.scm";
-#   "nvim/queries/proto/highlights.scm".source =
-#     "${sources.tree-sitter-proto}/queries/highlights.scm";
-#   "nvim/queries/proto/textobjects.scm".source =
-#     ./textobjects.scm;
+  # tree-sitter parsers
+  "nvim/parser/proto.so".source = "${pkgs.tree-sitter-proto}/parser";
+  "nvim/queries/proto/folds.scm".source =
+    "${sources.tree-sitter-proto}/queries/folds.scm";
+  "nvim/queries/proto/highlights.scm".source =
+    "${sources.tree-sitter-proto}/queries/highlights.scm";
+  "nvim/queries/proto/textobjects.scm".source =
+    ./textobjects.scm;
     } // (if isDarwin then {
 # Rectangle.app. This has to be imported manually using the app.
     "rectangle/RectangleConfig.json".text = builtins.readFile ./RectangleConfig.json;
@@ -285,19 +288,19 @@ programs.alacritty = {
         font = {
             size = 14;
             normal = {
-                family = "JetBrains Mono";
+                family = "JetBrainsMono Nerd Font";
                 style = "Regular";
             };
             italic = {
-                family = "JetBrains Mono";
+                family = "JetBrainsMono Nerd Font";
                 style = "Italic";
             };
             bold = {
-                family = "JetBrains Mono";
+                family = "JetBrainsMono Nerd Font";
                 style = "Bold";
             };
             bold_italic = {
-                family = "JetBrains Mono";
+                family = "JetBrainsMono Nerd Font";
                 style = "Bold Italic";
             };
         };
@@ -325,86 +328,97 @@ programs.i3status = {
     };
 };
 
-programs.neovim = {
+programs.nixvim = {
     enable = true;
-    withPython3 = true;
-    defaultEditor = true;
-    vimAlias = true;
-    viAlias = true;
+};
+    
+    programs.neovim = {
+        enable = false;
+        # package = pkgs.neovim-nightly;
+        withPython3 = true;
+        defaultEditor = true;
+        vimAlias = true;
+        viAlias = true;
 
-    plugins = [
-        # Telescope
-        pkgs.vimPlugins.plenary-nvim
-        pkgs.vimPlugins.popup-nvim
-        pkgs.vimPlugins.telescope-nvim
-        
-        # Status and Buffer line
-        pkgs.vimPlugins.lualine-nvim
-        pkgs.vimPlugins.bufferline-nvim
-        pkgs.vimPlugins.nvim-web-devicons
-        
-        # LSP
-        pkgs.vimPlugins.lspkind-nvim
-        pkgs.vimPlugins.lsp_extensions-nvim
-        pkgs.vimPlugins.lspsaga-nvim
-        pkgs.vimPlugins.symbols-outline-nvim
+        plugins = [
+            # Telescope
+            pkgs.vimPlugins.plenary-nvim
+            pkgs.vimPlugins.popup-nvim
+            pkgs.vimPlugins.telescope-nvim
+            
+            # Status and Buffer line
+            pkgs.vimPlugins.lualine-nvim
+            pkgs.vimPlugins.bufferline-nvim
+            pkgs.vimPlugins.nvim-web-devicons
+            
+            # LSP
+            pkgs.vimPlugins.lspkind-nvim
+            pkgs.vimPlugins.lsp_extensions-nvim
+            pkgs.vimPlugins.lspsaga-nvim
+            pkgs.vimPlugins.symbols-outline-nvim
 
-        pkgs.vimPlugins.nvim-treesitter
-        pkgs.vimPlugins.undotree
-        
-        # LSP Zero
-        # # LSP Support
-        pkgs.vimPlugins.lsp-zero-nvim
-        pkgs.vimPlugins.nvim-lspconfig
-        pkgs.vimPlugins.mason-nvim
-        pkgs.vimPlugins.mason-lspconfig-nvim
+            pkgs.vimPlugins.nvim-treesitter
+            pkgs.vimPlugins.nvim-treesitter.withAllGrammars
+            pkgs.vimPlugins.nvim-treesitter-textobjects
+            pkgs.vimPlugins.undotree
+            
+            # LSP Zero
+            # # LSP Support
+            pkgs.vimPlugins.nvim-lspconfig
+            pkgs.vimPlugins.mason-nvim
+            pkgs.vimPlugins.mason-lspconfig-nvim
 
-        # # Autocompletion
-        pkgs.vimPlugins.nvim-cmp
-        pkgs.vimPlugins.cmp-buffer
-        pkgs.vimPlugins.cmp-path
-        pkgs.vimPlugins.cmp_luasnip
-        pkgs.vimPlugins.cmp-nvim-lsp
-        pkgs.vimPlugins.cmp-nvim-lua
-        
-        # # Snippets
-        pkgs.vimPlugins.luasnip
-        pkgs.vimPlugins.friendly-snippets
+            # # Autocompletion
+            pkgs.vimPlugins.cmp-nvim-lsp
+            pkgs.vimPlugins.cmp-buffer
+            pkgs.vimPlugins.cmp-path
+            pkgs.vimPlugins.cmp-cmdline
+            pkgs.vimPlugins.nvim-cmp
+            pkgs.vimPlugins.cmp_luasnip
+            pkgs.vimPlugins.fidget-nvim
+            
+            # # Snippets
+            pkgs.vimPlugins.luasnip
+            pkgs.vimPlugins.friendly-snippets
 
-        # Autopairs
-        pkgs.vimPlugins.auto-pairs
+            # Autopairs
+            pkgs.vimPlugins.auto-pairs
 
-        # Comments
-        pkgs.vimPlugins.nvim-comment
-        
-        # Trouble
-        pkgs.vimPlugins.trouble-nvim
-        
-        # Theme
-        pkgs.vimPlugins.gruvbox-nvim
-        pkgs.vimPlugins.gruvbox-material
+            # Comments
+            pkgs.vimPlugins.comment-nvim
+            
+            # Trouble
+            pkgs.vimPlugins.trouble-nvim
+            
+            # Theme
+            pkgs.vimPlugins.gruvbox-nvim
+            pkgs.vimPlugins.gruvbox-material
+            pkgs.vimPlugins.catppuccin-nvim
 
-        # Copilot
-        pkgs.vimPlugins.copilot-vim
-    ];
+            # Copilot
+            pkgs.vimPlugins.copilot-vim
+        ];
 
-    extraConfig = ''
-        lua << EOF
-        ${builtins.readFile (basePath + "/nvim/lua/plugin/remap.lua")}
-        ${builtins.readFile (basePath + "/nvim/lua/plugin/set.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/telescope.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/colors.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/copilot.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/format.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/lsp.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/luasnip.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/statusline.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/telescope.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/treesitter.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/trouble.lua")}
-        ${builtins.readFile (basePath + "/nvim/after/plugin/setups.lua")}
-    '';
+        extraLuaConfig = ''
+            ${builtins.readFile ./nvim/lua/plugin/remap.lua}
+            ${builtins.readFile ./nvim/lua/plugin/set.lua}
+            ${builtins.readFile ./nvim/after/plugin/telescope.lua}
+            ${builtins.readFile ./nvim/after/plugin/colors.lua}
+            ${builtins.readFile ./nvim/after/plugin/copilot.lua}
+            ${builtins.readFile ./nvim/after/plugin/format.lua}
+            ${builtins.readFile ./nvim/after/plugin/lsp.lua}
+            ${builtins.readFile ./nvim/after/plugin/luasnip.lua}
+            ${builtins.readFile ./nvim/after/plugin/statusline.lua}
+            ${builtins.readFile ./nvim/after/plugin/telescope.lua}
+            ${builtins.readFile ./nvim/after/plugin/treesitter.lua}
+            ${builtins.readFile ./nvim/after/plugin/trouble.lua}
+            ${builtins.readFile ./nvim/after/plugin/setups.lua}
+        '';
+
 }; 
+
+#home.file.".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.config/nvim";
+    
 
 programs.zsh ={
     enable = true;

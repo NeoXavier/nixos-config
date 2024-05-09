@@ -119,6 +119,7 @@ in {
     packages = [
       pkgs.fira-code
       pkgs.jetbrains-mono
+      (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"];})
     ];
   };
 

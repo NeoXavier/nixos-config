@@ -18,4 +18,8 @@
     shell = pkgs.zsh;
     initialPassword = "password";
   };
+
+  nixpkgs.overlays = import ../../lib/overlays.nix ++ [
+    (import ./vim.nix { inherit inputs;})
+  ];
 }

@@ -21,24 +21,24 @@
 -- })
 -- vim.cmd.colorscheme('rose-pine-moon')
 
--- require("catppuccin").setup({
---     flavour = "mocha",
---     -- flavour = "macchiato",
---     -- background = {
---     --     dark = "mocha",
---     -- },
---
--- })
--- vim.cmd.colorscheme('catppuccin')
+require("catppuccin").setup({
+    flavour = "mocha",
+    -- flavour = "macchiato",
+    -- background = {
+    --     dark = "mocha",
+    -- },
+
+})
+vim.cmd.colorscheme('catppuccin')
 
 -- vim.cmd.colorscheme('gruvbox')
 
 -- Gruvbox Material
 
-vim.g.gruvbox_material_better_performance = 1
-vim.g.gruvbox_material_foreground = 'mix'
-vim.g.gruvbox_material_background = 'hard'
-vim.g.gruvbox_material_ui_contrast = 'high' -- The contrast of line numbers, indent lines, etc.
-
-vim.cmd.colorscheme('gruvbox-material')
+-- vim.g.gruvbox_material_better_performance = 1
+-- vim.g.gruvbox_material_foreground = 'mix'
+-- vim.g.gruvbox_material_background = 'hard'
+-- vim.g.gruvbox_material_ui_contrast = 'high' -- The contrast of line numbers, indent lines, etc.
+--
+-- vim.cmd[[colorscheme gruvbox-material]]
 
