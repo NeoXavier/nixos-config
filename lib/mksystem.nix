@@ -38,6 +38,7 @@ in systemFunc rec {
       # ];
       home-manager.users.${user} = import userHMConfig {
         inputs = inputs;
+        nixvim = nixvim;
       };
     }
 
