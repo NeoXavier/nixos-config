@@ -1,6 +1,5 @@
 # This function creates a NixOS system based on our VM setup for a
 # particular architecture.
-# { nixpkgs, overlays, inputs }:
 { nixpkgs, overlays, inputs, nixvim}:
 
 name:
@@ -34,9 +33,9 @@ in systemFunc rec {
     home-manager.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.sharedModules = [
-          nixvim.homeManagerModules.nixvim
-      ];
+      # home-manager.sharedModules = [
+      #     nixvim.homeManagerModules.nixvim
+      # ];
       home-manager.users.${user} = import userHMConfig {
         inputs = inputs;
       };
