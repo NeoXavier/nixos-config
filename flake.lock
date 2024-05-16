@@ -210,23 +210,6 @@
         "type": "github"
       }
     },
-    "nvim-treesitter": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1691831669,
-        "narHash": "sha256-1Iuvq0hVQ7LyBYOkJ5d07NkwbGcR1K61ZZmAAA7ABGs=",
-        "owner": "nvim-treesitter",
-        "repo": "nvim-treesitter",
-        "rev": "63260da18bf273c76b8e2ea0db84eb901cab49ce",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nvim-treesitter",
-        "ref": "v0.9.1",
-        "repo": "nvim-treesitter",
-        "type": "github"
-      }
-    },
     "poetry2nix": {
       "inputs": {
         "flake-utils": [
@@ -285,8 +268,7 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "nixvim": "nixvim",
-        "nvim-treesitter": "nvim-treesitter"
+        "nixvim": "nixvim"
       }
     },
     "systems": {

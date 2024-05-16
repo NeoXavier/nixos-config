@@ -15,11 +15,18 @@ let
   '' else ''
     cat "$1" | col -bx | bat --language man --style plain
   ''));
+
+  # Nixvim
+  nvimconfig = import ./nixvim;
+  nvim = inputs.nixvim.legacyPackages.aarch64-linux.makeNixvimWithModule {
+  inherit pkgs;
+  module = nvimconfig;
+  };
 in
 {
 
   imports = [
-    nixvim.homeManagerModules.nixvim
+    inputs.nixvim.homeManagerModules.nixvim
     ./alacritty.nix
   ];
 
@@ -37,34 +44,35 @@ in
   # Packages I always want installed. Most packages I install using
   # per-project flakes sourced with direnv and nix-shell, so this is
   # not a huge list.
-  home.packages = [
-    pkgs.asciinema
-    pkgs.bat
-    pkgs.fd
-    pkgs.fzf
-    pkgs.gh
-    pkgs.htop
-    pkgs.jq
-    pkgs.ripgrep
-    pkgs.tree
-    pkgs.autojump
-    pkgs.oh-my-zsh
-    pkgs.tree-sitter
+  home.packages = with pkgs; [
+    asciinema
+    bat
+    fd
+    fzf
+    gh
+    htop
+    jq
+    ripgrep
+    tree
+    autojump
+    oh-my-zsh
+    tree-sitter
 
-    pkgs.gcc
+    nvim
+
 
     # Node is required for Copilot.vim
-    pkgs.nodejs
+    nodejs
   ] ++ (lib.optionals isDarwin [
     # This is automatically setup on Linux
-    pkgs.cachix
-    pkgs.tailscale
+    cachix
+    tailscale
   ]) ++ (lib.optionals (isLinux) [
-    pkgs.chromium
-    pkgs.firefox
-    pkgs.rofi
-    pkgs.zathura
-    pkgs.xfce.xfce4-terminal
+    chromium
+    firefox
+    rofi
+    zathura
+    xfce.xfce4-terminal
   ]);
 
   #---------------------------------------------------------------------
@@ -233,10 +241,6 @@ in
       "wireless _first_".enable = false;
       "battery all".enable = false;
     };
-  };
-
-  programs.nixvim = {
-    enable = true;
   };
 
   programs.neovim = {

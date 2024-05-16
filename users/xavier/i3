@@ -61,7 +61,7 @@ bindsym $mod+Shift+d split v
 bindsym $mod+Shift+n exec /home/mitchellh/bin/devtty --config-file=/home/mitchellh/.config/devtty/config
 
 # kill focused window
-bindsym $mod+w kill
+bindsym $mod+q kill
 
 # change focus
 bindsym $mod+h focus left
