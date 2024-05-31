@@ -249,7 +249,7 @@
     {
       key = "<leader>f";
       mode = ["n" "v"];
-      action = "<CMD>lua vim.lsp.buf.format()<CR>";
+      action = "<CMD>lua require('conform').format()<CR>";
       options = {
         silent = true;
         noremap = true;

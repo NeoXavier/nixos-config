@@ -63,7 +63,19 @@
       oil.enable = true;
       undotree.enable = true;
       fugitive.enable = true;
+      comment-nvim.enable = true;
     };
+    extraPlugins = with pkgs.vimPlugins; [
+      {
+        plugin = gruvbox-material;
+        config = ''
+          let g:gruvbox_material_forground = 'mix'
+          let g:gruvbox_material_background = 'hard'
+          let g:gruvbox_material_ui_contrast = 'high'
+          colorscheme gruvbox-material
+        '';
+      }
+    ];
     extraPackages = with pkgs; [
       # Formatters
       alejandra
@@ -106,12 +118,12 @@
       llvmPackages_17.bintools-unwrapped
       marksman
 
-      (nerdfonts.override {
-        fonts = [
-          "JetBrainsMono"
-          "RobotoMono"
-        ];
-      })
+      # (nerdfonts.override {
+      #   fonts = [
+      #     "JetBrainsMono"
+      #     "RobotoMono"
+      #   ];
+      # })
 
       python3
       ripgrep

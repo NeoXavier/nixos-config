@@ -1,8 +1,9 @@
-{ inputs, nixvim, ... }:
-
-{ config, lib, pkgs, ... }:
-
-let
+{inputs, ...}: {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   sources = import ../../nix/sources.nix;
   basePath = toString ./.;
   isDarwin = pkgs.stdenv.isDarwin;
@@ -10,26 +11,27 @@ let
 
   # For our MANPAGER env var
   # https://github.com/sharkdp/bat/issues/1145
-  manpager = (pkgs.writeShellScriptBin "manpager" (if isDarwin then ''
-    sh -c 'col -bx | bat -l man -p'
-  '' else ''
-    cat "$1" | col -bx | bat --language man --style plain
-  ''));
+  manpager = pkgs.writeShellScriptBin "manpager" (
+    if isDarwin
+    then ''
+      sh -c 'col -bx | bat -l man -p'
+    ''
+    else ''
+      cat "$1" | col -bx | bat --language man --style plain
+    ''
+  );
 
   # Nixvim
   nvimconfig = import ./nixvim;
   nvim = inputs.nixvim.legacyPackages.aarch64-linux.makeNixvimWithModule {
-  inherit pkgs;
-  module = nvimconfig;
+    inherit pkgs;
+    module = nvimconfig;
   };
-in
-{
-
+in {
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
     ./alacritty.nix
   ];
-
 
   # Home-manager 22.11 requires this be set. We never set it so we have
   # to use the old state version.
@@ -44,36 +46,38 @@ in
   # Packages I always want installed. Most packages I install using
   # per-project flakes sourced with direnv and nix-shell, so this is
   # not a huge list.
-  home.packages = with pkgs; [
-    asciinema
-    bat
-    fd
-    fzf
-    gh
-    htop
-    jq
-    ripgrep
-    tree
-    autojump
-    oh-my-zsh
-    tree-sitter
+  home.packages = with pkgs;
+    [
+      asciinema
+      bat
+      fd
+      fzf
+      gh
+      htop
+      jq
+      ripgrep
+      tree
+      autojump
+      oh-my-zsh
+      tree-sitter
 
-    nvim
+      nvim
 
-
-    # Node is required for Copilot.vim
-    nodejs
-  ] ++ (lib.optionals isDarwin [
-    # This is automatically setup on Linux
-    cachix
-    tailscale
-  ]) ++ (lib.optionals (isLinux) [
-    chromium
-    firefox
-    rofi
-    zathura
-    xfce.xfce4-terminal
-  ]);
+      # Node is required for Copilot.vim
+      nodejs
+    ]
+    ++ (lib.optionals isDarwin [
+      # This is automatically setup on Linux
+      cachix
+      tailscale
+    ])
+    ++ (lib.optionals isLinux [
+      chromium
+      firefox
+      rofi
+      zathura
+      xfce.xfce4-terminal
+    ]);
 
   #---------------------------------------------------------------------
   # Env vars and dotfiles
@@ -91,24 +95,33 @@ in
   # home.file.".gdbinit".source = ./gdbinit;
   # home.file.".inputrc".source = ./inputrc;
 
-  xdg.configFile = {
-    "i3/config".text = builtins.readFile ./i3;
-    "rofi/config.rasi".text = builtins.readFile ./rofi;
+  xdg.configFile =
+    {
+      "i3/config".text = builtins.readFile ./i3;
+      "rofi/config.rasi".text = builtins.readFile ./rofi;
 
-    # tree-sitter parsers
-    "nvim/parser/proto.so".source = "${pkgs.tree-sitter-proto}/parser";
-    "nvim/queries/proto/folds.scm".source =
-      "${sources.tree-sitter-proto}/queries/folds.scm";
-    "nvim/queries/proto/highlights.scm".source =
-      "${sources.tree-sitter-proto}/queries/highlights.scm";
-    "nvim/queries/proto/textobjects.scm".source =
-      ./textobjects.scm;
-  } // (if isDarwin then {
-    # Rectangle.app. This has to be imported manually using the app.
-    "rectangle/RectangleConfig.json".text = builtins.readFile ./RectangleConfig.json;
-  } else { }) // (if isLinux then {
-    "ghostty/config".text = builtins.readFile ./ghostty.linux;
-  } else { });
+      # tree-sitter parsers
+      "nvim/parser/proto.so".source = "${pkgs.tree-sitter-proto}/parser";
+      "nvim/queries/proto/folds.scm".source = "${sources.tree-sitter-proto}/queries/folds.scm";
+      "nvim/queries/proto/highlights.scm".source = "${sources.tree-sitter-proto}/queries/highlights.scm";
+      "nvim/queries/proto/textobjects.scm".source =
+        ./textobjects.scm;
+    }
+    // (
+      if isDarwin
+      then {
+        # Rectangle.app. This has to be imported manually using the app.
+        "rectangle/RectangleConfig.json".text = builtins.readFile ./RectangleConfig.json;
+      }
+      else {}
+    )
+    // (
+      if isLinux
+      then {
+        "ghostty/config".text = builtins.readFile ./ghostty.linux;
+      }
+      else {}
+    );
   #
   #---------------------------------------------------------------------
   # Programs
@@ -116,41 +129,32 @@ in
 
   programs.gpg.enable = !isDarwin;
 
-  /* programs.bash = {
-    enable = true;
-    shellOptions = [];
-    historyControl = [ "ignoredups" "ignorespace" ];
-    initExtra = builtins.readFile ./bashrc;
+  /*
+      programs.bash = {
+  enable = true;
+  shellOptions = [];
+  historyControl = [ "ignoredups" "ignorespace" ];
+  initExtra = builtins.readFile ./bashrc;
 
-    shellAliases = {
-    ga = "git add";
-    gc = "git commit";
-    gco = "git checkout";
-    gcp = "git cherry-pick";
-    gdiff = "git diff";
-    gl = "git prettylog";
-    gp = "git push";
-    gs = "git status";
-    gt = "git tag";
-    };
-    };
-
-    programs.direnv= {
-    enable = true;
-
-    config = {
-    whitelist = {
-    prefix= [
-    "$HOME/code/go/src/github.com/hashicorp"
-    "$HOME/code/go/src/github.com/mitchellh"
-    ];
-
-    exact = ["$HOME/.envrc"];
-    };
-    };
-    };
+  shellAliases = {
+  ga = "git add";
+  gc = "git commit";
+  gco = "git checkout";
+  gcp = "git cherry-pick";
+  gdiff = "git diff";
+  gl = "git prettylog";
+  gp = "git push";
+  gs = "git status";
+  gt = "git tag";
+  };
+  };
   */
 
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
+  };
 
   programs.git = {
     enable = true;
@@ -224,7 +228,6 @@ in
               bind-key -r f run-shell "tmux neww ~/.local/bin/tmux-sessionizer"
     '';
   };
-
 
   programs.i3status = {
     enable = true;
@@ -325,32 +328,72 @@ in
       ${builtins.readFile ./nvim/after/plugin/trouble.lua}
       ${builtins.readFile ./nvim/after/plugin/setups.lua}
     '';
-
   };
 
   #home.file.".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.config/nvim";
-
-
   programs.zsh = {
     enable = true;
+    enableCompletion = true;
+    completionInit = "autoload -U compinit && compinit\nsource ${pkgs.zsh-fzf-tab}/share/fzf-tab/fzf-tab.plugin.zsh";
+    enableAutosuggestions = true;
+    syntaxHighlighting.enable = true;
     oh-my-zsh = {
       enable = true;
       plugins = [
         "autojump"
+        "direnv"
       ];
       theme = "agnoster";
+    };
+    initExtra = ''
+      #Shotcuts
+      j() {
+          cd "$(cat /Users/xavier/Library/autojump/autojump.txt | cut -f2 | sed 's|^/||' | fzf | sed 's|^|/|')"
+      }
+
+      # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+      [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+      # PyEnv Configuration
+      # export PATH="~/.pyenv/bin:$PATH" (for linux)
+      # export PYENV_ROOT="$HOME/.pyenv"
+      # export PATH="$PYENV_ROOT/bin:$PATH"
+      # eval "$(pyenv init --path)"
+      # eval "$(pyenv virtualenv-init -)"
+
+      #if which pyenv-virtualenv-init > /dev/null; then
+      #eval "$(pyenv virtualenv-init -)";
+      #fi
+
+      # >>> conda initialize >>>
+      # !! Contents within this block are managed by 'conda init' !!
+      __conda_setup="$('/Users/xavier/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+      if [ $? -eq 0 ]; then
+          eval "$__conda_setup"
+      else
+          if [ -f "/Users/xavier/anaconda3/etc/profile.d/conda.sh" ]; then
+              . "/Users/xavier/anaconda3/etc/profile.d/conda.sh"
+          else
+              export PATH="/Users/xavier/anaconda3/bin:$PATH"
+                  fi
+                  fi
+                  unset __conda_setup
+      # <<< conda initialize <<<
+
+    '';
+    shellAliases = {
+      # s = "kitten ssh";
+      yoink = "open -a Yoink";
     };
   };
 
   xresources.extraConfig = builtins.readFile ./Xresources;
 
   # Make cursor not tiny on HiDPI screens
-  home.pointerCursor = lib.mkIf (isLinux) {
+  home.pointerCursor = lib.mkIf isLinux {
     name = "Vanilla-DMZ";
     package = pkgs.vanilla-dmz;
     size = 128;
     x11.enable = true;
   };
 }
-
-

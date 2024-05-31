@@ -1,9 +1,9 @@
 {pkgs, ...}: {
-  colorschemes.tokyonight = {
-    enable = true;
-    style = "night";
-    transparent = true;
-  };
+  #colorschemes.tokyonight = {
+  #enable = true;
+  #style = "night";
+  #transparent = true;
+  #};
   plugins = {
     notify.enable = true;
     lualine = {
